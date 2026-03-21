@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  workflow_call:
+
+jobs:
+  release:
+    name: Package & Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get resource name
+        id: meta
+        run: |
+          echo "name=$(basename ${{ github.repository }})" >> "$GITHUB_OUTPUT"
+          echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+
+      - name: Package resource
+        run: |
+          mkdir -p /tmp/release
+          rsync -a \
+            --exclude='nui/src' \
+            --exclude='nui/node_modules' \
+            --exclude='.github' \
+            --exclude='.git' \
+            --exclude='.gitignore' \
+            --exclude='.editorconfig' \
+            --exclude='*.md' \
+            --exclude='.stylua.toml' \
+            --exclude='selene.toml' \
+            --exclude='selene' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='tsconfig.json' \
+            --exclude='tsconfig.node.json' \
+            --exclude='vite.config.ts' \
+            --exclude='.eslintrc*' \
+            --exclude='.prettierrc*' \
+            ./ /tmp/release/${{ steps.meta.outputs.name }}/
+          cd /tmp/release
+          zip -r /tmp/${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.tag }}.zip ${{ steps.meta.outputs.name }}/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }} ${{ steps.meta.outputs.tag }}
+          generate_release_notes: true
+          files: /tmp/${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.tag }}.zip

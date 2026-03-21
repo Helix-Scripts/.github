@@ -1,0 +1,83 @@
+name: Bug Report
+description: Report a bug in a Helix script
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: script
+    attributes:
+      label: Script
+      description: Which Helix script is this about?
+      options:
+        - helix_lib
+        - helix_hud
+        - helix_npc
+        - helix_economy
+        - helix_crafting
+        - helix_dispatch
+        - helix_devtools
+        - helix_missions
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Script Version
+      description: "Check with `helix_version` in server console"
+      placeholder: "e.g. 1.0.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Framework
+      options:
+        - Qbox
+        - QBCore
+        - ESX
+        - Standalone
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Clear description of what happened vs. what you expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Minimal steps to trigger the bug
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Server/Client Console Output
+      description: Paste relevant console output (wrap in code blocks)
+      render: shell
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant Config
+      description: Any config values that might be related (remove sensitive data)
+      render: lua
+
+  - type: input
+    id: artifacts
+    attributes:
+      label: Artifacts Version
+      description: "FiveM artifacts version"
+      placeholder: "e.g. 7290"

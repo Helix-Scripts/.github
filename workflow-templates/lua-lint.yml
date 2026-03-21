@@ -1,0 +1,33 @@
+name: Lua Lint
+
+on:
+  workflow_call:
+
+jobs:
+  stylua:
+    name: StyLua Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check .
+
+  selene:
+    name: Selene Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install selene
+        run: |
+          curl -L -o selene.zip https://github.com/Kampfkarren/selene/releases/latest/download/selene-linux.zip
+          unzip selene.zip
+          chmod +x selene
+          sudo mv selene /usr/local/bin/
+
+      - name: Run selene
+        run: selene .
