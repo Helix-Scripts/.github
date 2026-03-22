@@ -39,7 +39,6 @@ jobs:
           cd nui
           npm ci
           npm run build
-          cp -r dist ../html/
 
       - name: Package resource
         continue-on-error: false
