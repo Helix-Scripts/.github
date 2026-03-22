@@ -34,6 +34,7 @@ jobs:
 
       - name: Build NUI
         if: steps.nui-check.outputs.exists == 'true'
+        continue-on-error: false
         run: |
           cd nui
           npm ci
@@ -41,6 +42,7 @@ jobs:
           cp -r dist ../html/
 
       - name: Package resource
+        continue-on-error: false
         run: |
           mkdir -p /tmp/release
           rsync -a \
@@ -64,6 +66,7 @@ jobs:
           zip -r /tmp/${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.tag }}.zip ${{ steps.meta.outputs.name }}/
 
       - name: Create GitHub Release
+        continue-on-error: false
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
