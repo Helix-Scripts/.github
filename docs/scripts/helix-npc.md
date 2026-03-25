@@ -12,7 +12,7 @@ AI-Enhanced NPC Interaction System for FiveM. Create living, breathing NPCs with
 - **LLM Integration** (Pro) — Claude or OpenAI powered free-text dialogue with automatic fallback
 - **CostGuard** — Per-player and server-wide token budgets and rate limiting
 - **Content Filter** — Multi-layer output filtering for LLM responses
-- **Cinematic NUI** — Letterbox, identity strip, panel mode, quest cards, bark bubbles
+- **Cinematic NUI** — Letterbox, identity strip, panel mode, quest cards
 - **11 Pre-built Templates** — Ready-to-use NPC archetypes for common server roles
 
 ## Requirements
