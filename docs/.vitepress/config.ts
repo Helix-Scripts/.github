@@ -28,6 +28,7 @@ export default defineConfig({
         items: [
           { text: 'helix_lib', link: '/scripts/helix-lib' },
           { text: 'helix_hud', link: '/scripts/helix-hud' },
+          { text: 'helix_npc', link: '/scripts/helix-npc' },
         ],
       },
       {
