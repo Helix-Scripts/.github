@@ -29,11 +29,13 @@ export default defineConfig({
           { text: 'helix_lib', link: '/scripts/helix-lib' },
           { text: 'helix_hud', link: '/scripts/helix-hud' },
           { text: 'helix_npc', link: '/scripts/helix-npc' },
+          { text: 'helix_devtools', link: '/scripts/helix-devtools' },
         ],
       },
       {
         text: 'Reference',
         items: [
+          { text: 'MCP Tool Reference', link: '/scripts/helix-devtools-tools' },
           { text: 'API', link: '/api/' },
           { text: 'FAQ', link: '/faq' },
         ],
