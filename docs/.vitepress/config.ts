@@ -51,17 +51,12 @@ export default defineConfig({
         text: 'Guides',
         items: [
           { text: 'Framework Bridge', link: '/guides/framework-bridge' },
-          { text: 'Common Examples', link: '/guides/examples' },
         ],
       },
       {
         text: 'API Reference',
         items: [
           { text: 'Exports', link: '/api/' },
-          { text: 'Client Utilities', link: '/api/client-utils' },
-          { text: 'Server Utilities', link: '/api/server-utils' },
-          { text: 'NUI Components', link: '/api/nui-components' },
-          { text: 'NUI Hooks', link: '/api/nui-hooks' },
           { text: 'MCP Tool Reference', link: '/scripts/helix-devtools-tools' },
           { text: 'FAQ', link: '/faq' },
         ],
