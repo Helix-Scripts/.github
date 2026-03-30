@@ -1,18 +1,322 @@
+/**
+ * Helix Scripts — VitePress Custom Theme
+ * Brand: Signal Violet
+ * Version: 1.0
+ */
+
+/* ============================================
+   BRAND COLOR TOKENS
+   VitePress expects a 3-stop brand scale:
+   brand-1 = primary, brand-2 = hover, brand-3 = pressed
+   ============================================ */
+
 :root {
-  --vp-c-brand-1: #0d9488;
-  --vp-c-brand-2: #0f766e;
-  --vp-c-brand-3: #115e59;
-  --vp-c-brand-soft: rgba(13, 148, 136, 0.14);
+  /* Brand */
+  --vp-c-brand-1: #7c3aed;
+  --vp-c-brand-2: #6d28d9;
+  --vp-c-brand-3: #5b21b6;
+  --vp-c-brand-soft: rgba(124, 58, 237, 0.14);
+
+  /* Extend: brand bright for highlights */
+  --helix-brand-bright: #a78bfa;
+  --helix-brand-light: #c4b5fd;
+  --helix-brand-wash: #e0d4ff;
+}
+
+/* ============================================
+   LIGHT MODE
+   ============================================ */
+
+:root {
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-alt: #f8f7fc;
+  --vp-c-bg-elv: #ffffff;
+  --vp-c-bg-soft: #f3f0fa;
+
+  /* Sidebar active */
+  --vp-c-brand-dimm-1: rgba(124, 58, 237, 0.08);
+  --vp-c-brand-dimm-2: rgba(124, 58, 237, 0.12);
+  --vp-c-brand-dimm-3: rgba(124, 58, 237, 0.16);
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+
+.dark {
+  --vp-c-bg: #0a0a0f;
+  --vp-c-bg-alt: #0d0d14;
+  --vp-c-bg-elv: #111118;
+  --vp-c-bg-soft: #1a1a24;
+
+  /* Slightly brighter brand in dark mode for contrast */
+  --vp-c-brand-1: #a78bfa;
+  --vp-c-brand-2: #9575f5;
+  --vp-c-brand-3: #7c3aed;
+  --vp-c-brand-soft: rgba(167, 139, 250, 0.16);
+
+  /* Dividers — subtle violet tint */
+  --vp-c-divider: rgba(167, 139, 250, 0.08);
+  --vp-c-gutter: #0a0a0f;
+
+  /* Text — slightly warm whites */
+  --vp-c-text-1: rgba(255, 255, 255, 0.92);
+  --vp-c-text-2: rgba(255, 255, 255, 0.56);
+  --vp-c-text-3: rgba(255, 255, 255, 0.32);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+:root {
+  /* Brand button (primary CTA) */
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-text: #ffffff;
+  --vp-button-brand-bg: #7c3aed;
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-brand-hover-text: #ffffff;
+  --vp-button-brand-hover-bg: #6d28d9;
+  --vp-button-brand-active-border: transparent;
+  --vp-button-brand-active-text: #ffffff;
+  --vp-button-brand-active-bg: #5b21b6;
+
+  /* Alt button (secondary CTA) */
+  --vp-button-alt-border: transparent;
+  --vp-button-alt-text: var(--vp-c-text-1);
+  --vp-button-alt-bg: var(--vp-c-bg-soft);
+  --vp-button-alt-hover-border: transparent;
+  --vp-button-alt-hover-text: var(--vp-c-text-1);
+  --vp-button-alt-hover-bg: var(--vp-c-bg-soft);
 }
 
 .dark {
-  --vp-c-brand-1: #2dd4bf;
-  --vp-c-brand-2: #14b8a6;
-  --vp-c-brand-3: #0d9488;
-  --vp-c-brand-soft: rgba(45, 212, 191, 0.14);
+  --vp-button-brand-bg: #7c3aed;
+  --vp-button-brand-hover-bg: #8b5cf6;
+  --vp-button-brand-active-bg: #6d28d9;
+
+  --vp-button-alt-bg: #1a1a24;
+  --vp-button-alt-hover-bg: #222233;
 }
 
+/* ============================================
+   NAV & SIDEBAR
+   ============================================ */
+
+/* Nav logo sizing */
+.VPNavBarTitle .logo {
+  height: 28px;
+  width: auto;
+}
+
+/* Nav — subtle bottom border */
+.VPNav {
+  border-bottom-color: var(--vp-c-divider) !important;
+}
+
+/* Sidebar — active link */
+.VPSidebar .is-active > .link > .text {
+  color: var(--vp-c-brand-1) !important;
+}
+
+/* Sidebar group title */
+.VPSidebarItem .text {
+  font-weight: 500;
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+
+/* Hero — premium name styling */
+.VPHero .name {
+  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 50%, #5b21b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* VitePress uses --vp-home-hero-name-color for the gradient — set it */
 :root {
   --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 50%, #06b6d4 100%);
+  --vp-home-hero-name-background: linear-gradient(
+    135deg,
+    #c4b5fd 0%,
+    #7c3aed 50%,
+    #5b21b6 100%
+  );
+}
+
+.dark {
+  --vp-home-hero-name-background: linear-gradient(
+    135deg,
+    #e0d4ff 0%,
+    #a78bfa 50%,
+    #7c3aed 100%
+  );
+}
+
+/* Hero image — glow effect */
+.VPHero .image-bg {
+  background: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.3) 0%,
+    rgba(167, 139, 250, 0.15) 100%
+  ) !important;
+  filter: blur(68px);
+  opacity: 0.8;
+}
+
+.dark .VPHero .image-bg {
+  opacity: 1;
+}
+
+/* Hero image container */
+.VPHero .image-container {
+  overflow: visible !important;
+}
+
+.VPHero .VPImage {
+  max-width: 120px !important;
+  max-height: 120px !important;
+}
+
+/* Hero — ambient glow behind content (dark mode) */
+.dark .VPHero::before {
+  content: '';
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px;
+  height: 500px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(124, 58, 237, 0.12) 0%,
+    rgba(167, 139, 250, 0.04) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================
+   FEATURE CARDS
+   ============================================ */
+
+.VPFeature {
+  border-radius: 12px !important;
+  transition: border-color 0.25s, box-shadow 0.25s !important;
+}
+
+.VPFeature:hover {
+  border-color: var(--vp-c-brand-1) !important;
+}
+
+.dark .VPFeature:hover {
+  box-shadow: 0 0 24px -8px rgba(124, 58, 237, 0.2);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+
+:root {
+  --vp-code-color: #5b21b6;
+  --vp-code-bg: rgba(124, 58, 237, 0.06);
+  --vp-code-block-bg: #f8f7fc;
+}
+
+.dark {
+  --vp-code-color: #c4b5fd;
+  --vp-code-bg: rgba(167, 139, 250, 0.12);
+  --vp-code-block-bg: #0d0d14;
+}
+
+/* Code block — premium border */
+.vp-code-group,
+div[class*='language-'] {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+}
+
+/* ============================================
+   CONTENT
+   ============================================ */
+
+/* Links — brand colored */
+.vp-doc a {
+  color: var(--vp-c-brand-1);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(124, 58, 237, 0.3);
+  transition: text-decoration-color 0.2s;
+}
+
+.vp-doc a:hover {
+  text-decoration-color: var(--vp-c-brand-1);
+}
+
+/* Blockquotes — violet left border */
+.vp-doc blockquote {
+  border-left-color: var(--vp-c-brand-1);
+}
+
+/* Custom containers (tip/warning/danger) — brand-aligned */
+.vp-doc .custom-block.tip {
+  border-color: var(--vp-c-brand-soft);
+}
+
+.vp-doc .custom-block.tip .custom-block-title {
+  color: var(--vp-c-brand-1);
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+/* Footer — subtle, premium */
+.VPFooter {
+  border-top-color: var(--vp-c-divider) !important;
+}
+
+/* ============================================
+   SCROLLBAR (dark mode)
+   ============================================ */
+
+.dark ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(167, 139, 250, 0.2);
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(167, 139, 250, 0.35);
+}
+
+/* ============================================
+   MISC POLISH
+   ============================================ */
+
+/* Badge — brand colored */
+.VPBadge.tip {
+  background-color: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+}
+
+/* Search highlight */
+.VPLocalSearchBox .result.selected {
+  border-color: var(--vp-c-brand-1);
+}
+
+/* Table header */
+.vp-doc th {
+  background-color: var(--vp-c-bg-soft);
 }

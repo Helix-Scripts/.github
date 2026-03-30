@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 48" fill="none">
+  <!-- Icon -->
+  <path d="M12 6 C12 6, 36 16, 36 24 C36 32, 12 42, 12 42" stroke="#6d28d9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M36 6 C36 6, 12 16, 12 24 C12 32, 36 42, 36 42" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="24" cy="14" r="2.5" fill="#7c3aed"/>
+  <circle cx="24" cy="24" r="2.5" fill="#6d28d9"/>
+  <circle cx="24" cy="34" r="2.5" fill="#5b21b6"/>
+  <!-- Wordmark -->
+  <text x="64" y="33" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" font-size="32" letter-spacing="-0.5" fill="#111111">Helix</text>
+  <text x="182" y="33" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-weight="400" font-size="28" fill="#666666">Scripts</text>
+</svg>

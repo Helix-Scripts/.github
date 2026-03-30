@@ -2,12 +2,22 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'Helix Scripts',
-  description: 'Documentation for Helix Scripts — premium FiveM resources',
+  description: 'Premium FiveM resources built for serious servers.',
   base: '/',
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' }],
+    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }],
+    ['meta', { name: 'theme-color', content: '#7c3aed' }],
+    ['meta', { property: 'og:title', content: 'Helix Scripts — Premium FiveM Resources' }],
+    ['meta', { property: 'og:description', content: 'Documentation for Helix Scripts — premium FiveM resources built for serious servers.' }],
   ],
   themeConfig: {
+    logo: {
+      dark: '/logo-dark.svg',
+      light: '/logo-light.svg',
+    },
+    siteTitle: false,
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Getting Started', link: '/getting-started/' },
@@ -59,9 +69,11 @@ export default defineConfig({
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Helix-Scripts' },
+      { icon: 'discord', link: 'https://discord.gg/helix' },
     ],
     footer: {
-      message: 'Built with care by Helix Scripts',
+      message: 'Premium FiveM resources.',
+      copyright: '\u00A9 2026 Helix Scripts',
     },
     search: {
       provider: 'local',
