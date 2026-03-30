@@ -2,7 +2,7 @@
 
 `helix_hud` is a high-performance FiveM HUD that leverages the [helix_lib](/scripts/helix-lib) framework bridge and NUI design system for a seamless experience across ESX, QBCore, and Qbox.
 
-**Version:** 0.2.0 | **License:** Commercial | **Dependency:** [helix_lib](./helix-lib)
+**Version:** 0.1.0 | **License:** Commercial | **Dependency:** [helix_lib](./helix-lib)
 
 ---
 
@@ -47,13 +47,48 @@ helix_hud/
 
 All configuration lives in `config.lua`. Key options:
 
+### General
+
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `Config.elements` | `table` | — | Toggle individual HUD elements on/off |
-| `Config.vehicle` | `table` | — | Vehicle HUD settings (speed unit, fuel display) |
+| `Config.framework` | `string` | `'auto'` | `'auto'`, `'qbox'`, `'qbcore'`, `'esx'`, or `'standalone'` |
 | `Config.theme` | `string` | `'dark'` | Theme: `'dark'` or `'light'` |
-| `Config.position` | `string` | `'bottom-right'` | HUD position on screen |
+| `Config.position` | `string` | `'bottom-right'` | `'bottom-right'`, `'bottom-left'`, or `'bottom-center'` |
 | `Config.scale` | `number` | `1.0` | Global scale multiplier |
+| `Config.hideInPauseMenu` | `boolean` | `true` | Auto-hide the HUD when the pause menu is open |
+
+### Elements
+
+Toggle individual HUD elements on or off:
+
+| Element | Default | Description |
+|---------|---------|-------------|
+| `health` | `true` | Health bar |
+| `armor` | `true` | Armour bar |
+| `hunger` | `true` | Hunger bar |
+| `thirst` | `true` | Thirst bar |
+| `stress` | `false` | Stress bar (off by default; not all servers use it) |
+| `stamina` | `true` | Stamina bar |
+| `cash` | `true` | Cash display |
+| `bank` | `false` | Bank balance (off by default for privacy) |
+| `job` | `true` | Current job label |
+| `serverId` | `true` | Player server ID |
+
+### Vehicle HUD
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `Config.vehicle.enabled` | `boolean` | `true` | Enable or disable the vehicle HUD entirely |
+| `Config.vehicle.speedUnit` | `string` | `'kmh'` | `'kmh'` or `'mph'` |
+| `Config.vehicle.fuelScript` | `string` | `'auto'` | Auto-detect or force: `'LegacyFuel'`, `'ox_fuel'`, `'cdn-fuel'` |
+| `Config.vehicle.seatbelt` | `boolean` | `true` | Show seatbelt indicator |
+
+### Update Intervals
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `Config.updateIntervals.health` | `number` | `200` | Milliseconds between status polls (health, armour, hunger, thirst, stress, stamina) |
+| `Config.updateIntervals.vehicle` | `number` | `100` | Milliseconds between vehicle polls (speed, fuel, engine, seatbelt) |
 
 ## Exports
 
@@ -73,3 +108,9 @@ if exports.helix_hud:isVisible() then
     print('HUD is showing')
 end
 ```
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `/hud` | Toggle HUD visibility on or off |

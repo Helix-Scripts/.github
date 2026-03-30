@@ -2,7 +2,7 @@
 
 Dynamic, real-time economy system for FiveM. Supply-and-demand pricing, market dashboards, auction house, and full admin controls.
 
-**Version:** 1.0.0 | **License:** Commercial | **Dependencies:** [helix_lib](./helix-lib), [oxmysql](https://github.com/overextended/oxmysql)
+**Version:** 0.1.0 | **License:** Commercial | **Dependencies:** [helix_lib](./helix-lib), [oxmysql](https://github.com/overextended/oxmysql)
 
 ## Features
 
