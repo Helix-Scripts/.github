@@ -16,6 +16,5 @@
   <circle cx="24" cy="24" r="2.5" fill="#a78bfa"/>
   <circle cx="24" cy="34" r="2.5" fill="#7c3aed"/>
   <!-- Wordmark -->
-  <text x="64" y="33" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-weight="700" font-size="32" letter-spacing="-0.5" fill="#ffffff">Helix</text>
-  <text x="182" y="33" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-weight="400" font-size="28" fill="#ffffff" opacity="0.5">Scripts</text>
+  <text x="64" y="33" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="28" fill="#ffffff"><tspan font-weight="700" font-size="32" letter-spacing="-0.5">Helix</tspan><tspan dx="6" font-weight="400" opacity="0.5">Scripts</tspan></text>
 </svg>
