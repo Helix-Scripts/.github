@@ -1,477 +1,475 @@
 # API Reference
 
-Complete reference for all `helix_lib` modules and exports.
+Complete reference for all `helix_lib` exports. All exports use the flat per-function pattern to survive FiveM's export proxy.
 
-## Framework Bridge
-
-The bridge auto-detects your framework and provides a unified API. All functions return consistent data shapes regardless of whether you run ESX, QBCore, or Qbox.
-
-### Usage
-
+**Usage pattern:**
 ```lua
-local bridge = exports.helix_lib:bridge()
+-- Correct (flat export)
+exports.helix_lib:bridge_GetPlayer(source)
+
+-- WRONG (old table pattern — does not work)
+-- exports.helix_lib:bridge().GetPlayer(source)
 ```
 
-### Server Functions
+---
 
-#### `bridge.GetPlayer(source)`
+## Bridge Exports
 
-Returns a normalised player object.
+### `bridge_framework`
+
+Returns the name of the detected framework.
+
+**Side:** Client, Server
 
 ```lua
----@param source number Player server ID
+local fw = exports.helix_lib:bridge_framework()
+-- Returns: 'qbox' | 'qbcore' | 'esx' | 'standalone'
+```
+
+### `bridge_getFramework`
+
+Same as `bridge_framework` but as a function call. Useful if you need to re-detect after a resource restart.
+
+**Side:** Client, Server
+
+```lua
+local fw = exports.helix_lib:bridge_getFramework()
+```
+
+### `bridge_is`
+
+Check if a specific framework is active.
+
+**Side:** Client, Server
+
+```lua
+---@param framework string  'qbox' | 'qbcore' | 'esx' | 'standalone'
+---@return boolean
+local isQbox = exports.helix_lib:bridge_is('qbox')
+```
+
+### `bridge_GetPlayer`
+
+Returns a normalised player object. **Server-only.**
+
+**Side:** Server
+
+```lua
+---@param source number  Player server ID
 ---@return HelixPlayer?
+local player = exports.helix_lib:bridge_GetPlayer(source)
 ```
 
 **HelixPlayer shape:**
-
 ```lua
 {
-  source     = 1,           -- number
-  name       = 'John Doe',  -- string (character name)
-  identifier = 'ABC12345',  -- string (citizenid / identifier)
-  job = {
-    name       = 'police',  -- string
-    label      = 'Police',  -- string
-    grade      = 3,         -- number
-    gradeLabel = 'Sergeant',-- string
-    onDuty     = true,      -- boolean
-  },
-  gang = {                  -- HelixGang? (nil if none)
-    name       = 'ballas',
-    label      = 'Ballas',
-    grade      = 0,
-    gradeLabel = 'Recruit',
-  },
-  money = {
-    cash   = 5000,          -- number
-    bank   = 25000,         -- number
-    crypto = 0,             -- number (Qbox/QBCore only)
-  },
+    source     = 1,
+    name       = 'John Doe',
+    identifier = 'ABC12345',
+    job = {
+        name       = 'police',
+        label      = 'Police',
+        grade      = 3,
+        gradeLabel = 'Sergeant',
+        onDuty     = true,
+    },
+    gang = {                  -- nil if no gang system
+        name       = 'ballas',
+        label      = 'Ballas',
+        grade      = 0,
+        gradeLabel = 'Recruit',
+    },
+    money = {
+        cash   = 5000,
+        bank   = 25000,
+        crypto = 0,           -- Qbox/QBCore only
+    },
 }
 ```
 
-#### `bridge.GetPlayerMoney(source, moneyType?)`
+### `bridge_GetPlayerMoney`
+
+Get a player's money balance.
+
+**Side:** Client, Server
 
 ```lua
----@param source number
----@param moneyType? string Default: 'cash'
+---@param source number      Player server ID
+---@param moneyType? string  'cash' | 'bank' | 'crypto' (default: 'cash')
 ---@return number
+local cash = exports.helix_lib:bridge_GetPlayerMoney(source, 'cash')
 ```
 
-#### `bridge.GetPlayerJob(source)`
+### `bridge_GetPlayerJob`
+
+Get a player's job info.
+
+**Side:** Client, Server
 
 ```lua
 ---@param source number
 ---@return HelixJob?
+local job = exports.helix_lib:bridge_GetPlayerJob(source)
+-- Returns: { name, label, grade, gradeLabel, onDuty }
 ```
 
-Returns `{ name, label, grade, gradeLabel, onDuty }`.
+### `bridge_GetPlayerIdentifier`
 
-#### `bridge.GetPlayerIdentifier(source)`
+Get a player's primary identifier (citizenid for QB/Qbox, identifier for ESX).
+
+**Side:** Client, Server
 
 ```lua
 ---@param source number
 ---@return string?
+local id = exports.helix_lib:bridge_GetPlayerIdentifier(source)
 ```
 
-#### `bridge.AddMoney(source, amount, moneyType?)`
+### `bridge_AddMoney`
+
+Add money to a player's account.
+
+**Side:** Client, Server
 
 ```lua
 ---@param source number
 ---@param amount number
----@param moneyType? string Default: 'cash'
+---@param moneyType? string  Default: 'cash'
 ---@return boolean success
+local ok = exports.helix_lib:bridge_AddMoney(source, 5000, 'bank')
 ```
 
-#### `bridge.RemoveMoney(source, amount, moneyType?)`
+### `bridge_RemoveMoney`
+
+Remove money from a player's account.
+
+**Side:** Client, Server
 
 ```lua
 ---@param source number
 ---@param amount number
----@param moneyType? string Default: 'cash'
+---@param moneyType? string  Default: 'cash'
 ---@return boolean success
+local ok = exports.helix_lib:bridge_RemoveMoney(source, 500, 'cash')
 ```
 
-#### `bridge.HasItem(source, item, count?)`
+### `bridge_HasItem`
 
-Checks player inventory. Uses `ox_inventory` if available, otherwise falls back to the framework's native inventory.
+Check if a player has an item. Uses `ox_inventory` if available, otherwise falls back to framework native inventory.
+
+**Side:** Client, Server
 
 ```lua
 ---@param source number
----@param item string Item name
----@param count? number Minimum count (default: 1)
+---@param item string      Item name
+---@param count? number    Minimum count (default: 1)
 ---@return boolean
+local has = exports.helix_lib:bridge_HasItem(source, 'water', 2)
 ```
 
-#### `bridge.Notify(source, message, type?, duration?)`
+### `bridge_Notify`
 
-Sends a notification. On server, triggers a client event. On client, uses `ox_lib` if available, otherwise falls back to framework notifications.
+Send a notification to a player. On server, triggers a client event. On client, uses framework notification system.
+
+**Side:** Client, Server
 
 ```lua
----@param source number
+---@param source number       Player server ID (nil on client)
 ---@param message string
----@param type? string 'success' | 'error' | 'warning' | 'info'
----@param duration? number Duration in milliseconds (default: 5000)
-```
-
-### Utility Functions
-
-#### `bridge.getFramework()`
-
-```lua
----@return string -- 'qbox' | 'qbcore' | 'esx' | 'standalone'
-```
-
-#### `bridge.is(framework)`
-
-```lua
----@param framework string
----@return boolean
+---@param type? string        'success' | 'error' | 'warning' | 'info'
+---@param duration? number    Duration in ms (default: 5000)
+exports.helix_lib:bridge_Notify(source, 'Item added!', 'success', 3000)
 ```
 
 ---
 
-## Config System
+## Config Exports
 
-Load, merge, and hot-reload Lua config tables.
+### `config`
 
-### Usage
+Returns the Config module. Use its methods to load, get, and reload configs.
+
+**Side:** Client, Server
 
 ```lua
-local config = exports.helix_lib:config()
+local Config = exports.helix_lib:config()
 ```
 
-### Functions
+**Config methods:**
 
-#### `config.load(resourceName, defaults?)`
+#### `Config.load(resourceName, defaults?)`
 
-Loads `config.lua` from the given resource and merges with optional defaults.
+Load `config.lua` from a resource and merge with optional defaults.
 
 ```lua
 ---@param resourceName string
 ---@param defaults? table
----@return table config
+---@return table
+local cfg = Config.load('helix_hud', { position = 'bottom-center' })
 ```
 
-#### `config.get(resourceName)`
+#### `Config.get(resourceName)`
 
-Returns a previously loaded config (does not re-read from disk).
+Get a previously loaded config (does not re-read from disk).
 
 ```lua
 ---@param resourceName string
 ---@return table?
+local cfg = Config.get('helix_lib')
 ```
 
-#### `config.reload(resourceName)`
+#### `Config.reload(resourceName)`
 
-Re-reads the config from disk and notifies all watchers.
+Re-read config from disk and notify all watchers.
 
 ```lua
----@param resourceName string
+Config.reload('helix_hud')
 ```
 
-#### `config.onReload(resourceName, callback)`
+#### `Config.onReload(resourceName, callback)`
 
-Registers a function to call when the config is reloaded.
+Register a callback for config changes.
 
 ```lua
----@param resourceName string
----@param cb fun(newConfig: table)
+Config.onReload('helix_hud', function(newConfig)
+    print('Config updated, new position:', newConfig.position)
+end)
+```
+
+#### `Config.merge(source, target)`
+
+Deep-merge two tables. Target values override source.
+
+```lua
+local merged = Config.merge(defaults, overrides)
 ```
 
 ---
 
-## Callback System
+## Locale Exports
 
-RPC-style server/client callbacks. If `ox_lib` is present, defers to its callback system for compatibility.
+### `locale_t`
 
-### Server — Register
+Translate a key with optional format arguments. Falls back to English if missing in current locale. Returns the key itself if no translation exists.
+
+**Side:** Client, Server
 
 ```lua
-local callback = exports.helix_lib:callback()
+---@param key string
+---@param ... any        Format arguments for string.format
+---@return string
+local msg = exports.helix_lib:locale_t('greeting', 'Alex')
+-- "Hello, Alex!"
+```
 
-callback.register('myScript:getData', function(source, arg1, arg2)
-    -- source is the requesting player's server ID
-    return { items = getItems(source) }
+### `locale_has`
+
+Check if a translation key exists.
+
+**Side:** Client, Server
+
+```lua
+---@param key string
+---@param lang? string   Language to check (default: current locale)
+---@return boolean
+local exists = exports.helix_lib:locale_has('greeting')
+```
+
+### `locale_current`
+
+Get the active locale code.
+
+**Side:** Client, Server
+
+```lua
+---@return string
+local lang = exports.helix_lib:locale_current() -- 'en'
+```
+
+### `locale_set`
+
+Set the active locale.
+
+**Side:** Client, Server
+
+```lua
+---@param lang string
+exports.helix_lib:locale_set('nl')
+```
+
+### `locale_load`
+
+Register translations for a language from a table.
+
+**Side:** Client, Server
+
+```lua
+---@param lang string
+---@param translations table<string, string>
+exports.helix_lib:locale_load('en', {
+    greeting = 'Hello, %s!',
+    farewell = 'Goodbye, %s.',
+})
+```
+
+### `locale_loadFile`
+
+Load translations from `locales/<lang>.lua` in a resource.
+
+**Side:** Client, Server
+
+```lua
+---@param lang string
+---@param resourceName? string   Defaults to current resource
+---@return boolean success
+exports.helix_lib:locale_loadFile('en')
+exports.helix_lib:locale_loadFile('en', 'helix_hud')
+```
+
+---
+
+## Callback Exports
+
+### `callback_register`
+
+Register a server-side callback handler. **Server-only.**
+
+**Side:** Server
+
+```lua
+---@param name string         Callback name
+---@param cb fun(source: number, ...): any
+exports.helix_lib:callback_register('myScript:getData', function(source, category)
+    return getItems(source, category)
 end)
 ```
 
-### Client — Trigger
+### `callback_trigger`
+
+Trigger a server callback asynchronously. The callback function receives the result. **Client-only.**
+
+**Side:** Client
 
 ```lua
-local callback = exports.helix_lib:callback()
+---@param name string         Callback name
+---@param cb fun(result: any) Callback with result
+---@param ... any             Arguments passed to server handler
+exports.helix_lib:callback_trigger('myScript:getData', function(result)
+    print(result)
+end, 'weapons')
+```
 
--- With callback function
-callback.trigger('myScript:getData', function(result)
-    print(result.items)
-end, arg1, arg2)
+### `callback_await`
 
--- With await (blocking)
-local result = callback.await('myScript:getData', arg1, arg2)
-print(result.items)
+Trigger a server callback and block until the result arrives. **Client-only.**
+
+**Side:** Client
+
+```lua
+---@param name string
+---@param ... any
+---@return any result
+local items = exports.helix_lib:callback_await('myScript:getData', 'weapons')
 ```
 
 ::: tip ox_lib Compatibility
-When `ox_lib` is present, `helix_lib` wraps its callback system. The API stays identical — your code works the same with or without `ox_lib`.
+When `ox_lib` is present, callbacks route through its system. The API stays identical — your code works the same with or without `ox_lib`.
 :::
 
 ---
 
-## Locale System
+## Convenience Exports
 
-Multi-language translations with `string.format` interpolation.
+### `notify`
 
-### Usage
+Client-side shorthand for sending a notification to the local player.
+
+**Side:** Client
 
 ```lua
-local locale = exports.helix_lib:locale()
+---@param message string
+---@param type? string       'success' | 'error' | 'warning' | 'info'
+---@param duration? number   Duration in ms (default: 5000)
+exports.helix_lib:notify('Inventory updated!', 'success')
 ```
 
-### Functions
+### `getPlayer`
 
-#### `locale.load(lang, translations)`
+Server-side convenience wrapper around `bridge_GetPlayer`.
 
-Register translations for a language.
+**Side:** Server
 
 ```lua
-locale.load('en', {
-    greeting = 'Hello, %s!',
-    money_format = '$%s',
-})
+---@param source number
+---@return HelixPlayer?
+local player = exports.helix_lib:getPlayer(source)
 ```
 
-#### `locale.loadFile(lang, resourceName?)`
+### `getPlayers`
 
-Load translations from `locales/<lang>.lua` in the given resource.
+Get all online players as HelixPlayer objects.
 
-```lua
-locale.loadFile('en')               -- loads from current resource
-locale.loadFile('en', 'helix_hud')  -- loads from another resource
-```
-
-#### `locale.set(lang)`
-
-Set the active locale.
+**Side:** Server
 
 ```lua
-locale.set('nl')
-```
-
-#### `locale.current()`
-
-Returns the current locale code.
-
-```lua
-local lang = locale.current() -- 'en'
-```
-
-#### `locale.t(key, ...)`
-
-Translate a key with optional format arguments. Falls back to English if the key is missing in the current locale.
-
-```lua
-locale.t('greeting', 'Alex') -- "Hello, Alex!"
-locale.t('missing_key')      -- returns 'missing_key' as-is
-```
-
-#### `locale.has(key, lang?)`
-
-Check whether a translation key exists.
-
-```lua
-locale.has('greeting')       -- true
-locale.has('greeting', 'de') -- false (if German not loaded)
+---@return HelixPlayer[]
+local players = exports.helix_lib:getPlayers()
+for _, p in ipairs(players) do
+    print(p.name, p.source)
+end
 ```
 
 ---
 
-## NUI Hooks (TypeScript)
-
-React hooks for communicating between the NUI layer and Lua.
-
-### `useNuiEvent<T>(action, handler)`
-
-Listen for NUI messages from Lua.
-
-```typescript
-useNuiEvent<PlayerData>('updatePlayer', (data) => {
-  setPlayer(data);
-});
-```
-
-### `useNuiCallback<T>(callbackName)`
-
-Send data to Lua and get a response.
-
-```typescript
-const { data, loading, error, execute } = useNuiCallback<SaveResponse>('saveConfig');
-
-await execute({ key: 'value' });
-```
-
-### `useKeyPress(key, handler)`
-
-Listen for keyboard shortcuts.
-
-```typescript
-useKeyPress('Escape', () => setVisible(false));
-```
-
-### `useNuiClose(onClose)`
-
-Convenience hook that posts a `close` message to the Lua client.
-
-```typescript
-useNuiClose(() => {
-  // cleanup before closing
-});
-```
-
----
-
-## NUI Components (React)
-
-Shared UI components using the Helix design system.
-
-### `<Button>`
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `variant` | `'primary' \| 'secondary' \| 'ghost' \| 'danger'` | `'primary'` | Visual style |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Button size |
-| `loading` | `boolean` | `false` | Show spinner, disable interaction |
-| `icon` | `ReactNode` | — | Icon before label |
-
-### `<Input>`
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `type` | `'text' \| 'number' \| 'search' \| 'password'` | `'text'` | Input type |
-| `label` | `string` | — | Label text |
-| `error` | `string` | — | Validation error message |
-| `icon` | `ReactNode` | — | Leading icon |
-
-### `<Panel>`
-
-Draggable container with optional title bar and close button.
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `title` | `string` | — | Panel header text |
-| `draggable` | `boolean` | `true` | Allow dragging by header |
-| `onClose` | `() => void` | — | Close button handler |
-| `width` / `height` | `number \| string` | — | Panel dimensions |
-| `initialX` / `initialY` | `number` | — | Initial position |
-
-### `<Select>`
-
-Dropdown with search/filter.
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `options` | `SelectOption[]` | `[]` | `{ value, label }` pairs |
-| `value` | `string` | — | Selected value |
-| `onChange` | `(value: string) => void` | — | Change handler |
-| `searchable` | `boolean` | `true` | Enable search filter |
-| `label` | `string` | — | Label text |
-| `placeholder` | `string` | — | Placeholder text |
-
-### `<DataTable>`
-
-Sortable, filterable data table.
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `columns` | `Column[]` | — | `{ key, header, sortable?, render? }` |
-| `data` | `Record<string, unknown>[]` | `[]` | Row data |
-| `filterable` | `boolean` | `true` | Show search filter |
-| `pageSize` | `number` | — | Rows per page |
-
-### `<Modal>`
-
-Overlay dialog with escape/backdrop dismissal.
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `open` | `boolean` | — | Visibility |
-| `onClose` | `() => void` | — | Close handler |
-| `title` | `string` | — | Modal title |
-| `variant` | `'confirm' \| 'form' \| 'info'` | `'info'` | Semantic variant |
-| `closeOnEscape` | `boolean` | `true` | Close on Escape key |
-| `closeOnBackdrop` | `boolean` | `true` | Close on backdrop click |
-| `footer` | `ReactNode` | — | Footer content (buttons) |
-
-### `<Toast>` / `<ToastProvider>`
-
-Notification toasts with auto-dismiss.
-
-```tsx
-// Wrap your app
-<ToastProvider position="top-right">
-  <App />
-</ToastProvider>
-
-// Inside any component
-const { addToast } = useToast();
-addToast({ message: 'Saved!', type: 'success', duration: 3000 });
-```
-
-| Toast type | Description |
-|------------|-------------|
-| `'success'` | Green — operation succeeded |
-| `'error'` | Red — something went wrong |
-| `'warning'` | Amber — caution |
-| `'info'` | Blue — informational |
-
-### `<ProgressBar>`
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | `number` | `0` | Progress 0–100 |
-| `variant` | `'linear' \| 'circular'` | `'linear'` | Display style |
-| `showLabel` | `boolean` | `true` | Show percentage text |
-| `color` | `string` | accent | Custom CSS color |
-| `size` | `number` | — | Diameter (circular only) |
-
-### `<Tabs>`
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `items` | `TabItem[]` | — | `{ key, label, content }` |
-| `defaultTab` | `string` | — | Initially active tab key |
-| `onChange` | `(key: string) => void` | — | Tab change handler |
-
-### `<Badge>`
-
-Status indicator label.
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `variant` | `'success' \| 'warning' \| 'error' \| 'info' \| 'neutral'` | `'neutral'` | Color variant |
-| `children` | `ReactNode` | — | Badge text |
-
----
-
-## Exports Summary
+## Export Summary
 
 ### Client Exports
 
 | Export | Returns | Description |
 |--------|---------|-------------|
-| `bridge()` | `HelixBridge` | Framework bridge |
-| `config()` | `HelixConfig` | Config manager |
-| `locale()` | `HelixLocale` | Locale manager |
-| `callback()` | `HelixCallback` | Callback system |
-| `notify(msg, type?, duration?)` | `void` | Client-side notification |
+| `bridge_framework()` | `string` | Detected framework name |
+| `bridge_getFramework()` | `string` | Detected framework (function form) |
+| `bridge_is(fw)` | `boolean` | Check if framework matches |
+| `bridge_GetPlayerMoney(src, type?)` | `number` | Player money balance |
+| `bridge_GetPlayerJob(src)` | `HelixJob?` | Player job info |
+| `bridge_GetPlayerIdentifier(src)` | `string?` | Player identifier |
+| `bridge_AddMoney(src, amt, type?)` | `boolean` | Add money |
+| `bridge_RemoveMoney(src, amt, type?)` | `boolean` | Remove money |
+| `bridge_HasItem(src, item, count?)` | `boolean` | Check inventory |
+| `bridge_Notify(src, msg, type?, dur?)` | `void` | Send notification |
+| `config()` | `HelixConfig` | Config module |
+| `locale_t(key, ...)` | `string` | Translate a key |
+| `locale_has(key, lang?)` | `boolean` | Check if key exists |
+| `locale_current()` | `string` | Active locale code |
+| `locale_set(lang)` | `void` | Set active locale |
+| `locale_load(lang, tbl)` | `void` | Load translations |
+| `locale_loadFile(lang, res?)` | `boolean` | Load from file |
+| `callback_trigger(name, cb, ...)` | `void` | Async server callback |
+| `callback_await(name, ...)` | `any` | Blocking server callback |
+| `notify(msg, type?, dur?)` | `void` | Local notification |
 
 ### Server Exports
 
 | Export | Returns | Description |
 |--------|---------|-------------|
-| `bridge()` | `HelixBridge` | Framework bridge |
-| `config()` | `HelixConfig` | Config manager |
-| `locale()` | `HelixLocale` | Locale manager |
-| `callback()` | `HelixServerCallback` | Callback registrar |
-| `getPlayer(source)` | `HelixPlayer?` | Unified player object |
-| `getPlayers()` | `HelixPlayer[]` | All connected players |
+| `bridge_framework()` | `string` | Detected framework name |
+| `bridge_getFramework()` | `string` | Detected framework (function form) |
+| `bridge_is(fw)` | `boolean` | Check if framework matches |
+| `bridge_GetPlayer(src)` | `HelixPlayer?` | Full player object |
+| `bridge_GetPlayerMoney(src, type?)` | `number` | Player money balance |
+| `bridge_GetPlayerJob(src)` | `HelixJob?` | Player job info |
+| `bridge_GetPlayerIdentifier(src)` | `string?` | Player identifier |
+| `bridge_AddMoney(src, amt, type?)` | `boolean` | Add money |
+| `bridge_RemoveMoney(src, amt, type?)` | `boolean` | Remove money |
+| `bridge_HasItem(src, item, count?)` | `boolean` | Check inventory |
+| `bridge_Notify(src, msg, type?, dur?)` | `void` | Send notification |
+| `config()` | `HelixConfig` | Config module |
+| `locale_t(key, ...)` | `string` | Translate a key |
+| `locale_has(key, lang?)` | `boolean` | Check if key exists |
+| `locale_current()` | `string` | Active locale code |
+| `locale_set(lang)` | `void` | Set active locale |
+| `locale_load(lang, tbl)` | `void` | Load translations |
+| `locale_loadFile(lang, res?)` | `boolean` | Load from file |
+| `callback_register(name, cb)` | `void` | Register server callback |
+| `getPlayer(src)` | `HelixPlayer?` | Convenience player getter |
+| `getPlayers()` | `HelixPlayer[]` | All online players |

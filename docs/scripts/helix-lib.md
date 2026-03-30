@@ -1,8 +1,45 @@
 # helix_lib
 
-`helix_lib` is the shared foundation for every Helix script. It provides a unified API layer across frameworks, a config system, NUI design tokens, localisation, and more.
+`helix_lib` is the shared foundation for every Helix script. It provides a unified API layer across frameworks, a config system, localisation, NUI design components, and callback RPC — all through flat per-function exports that survive FiveM's export proxy.
 
-**License:** MIT | **Price:** Free | **Source:** [GitHub](https://github.com/Helix-Scripts/helix_lib)
+**Version:** 0.1.0 | **License:** MIT | **Price:** Free
+
+---
+
+## Overview
+
+Every Helix script depends on `helix_lib`. It handles:
+
+- **Framework Bridge** — Abstracts ESX, QBCore, and Qbox behind a single API
+- **Config System** — Load, merge, and hot-reload Lua config tables
+- **Callback System** — RPC-style server/client callbacks with `ox_lib` compatibility
+- **Locale System** — Multi-language translations with `string.format` interpolation
+- **NUI Design System** — Shared React components and design tokens
+- **Version Check** — Automatic update checking against GitHub releases
+
+## Quick Start
+
+```lua
+-- Server: register a callback
+exports.helix_lib:callback_register('myScript:getData', function(source)
+    local money = exports.helix_lib:bridge_GetPlayerMoney(source, 'cash')
+    return { balance = money }
+end)
+
+-- Client: call it
+local result = exports.helix_lib:callback_await('myScript:getData')
+print('Balance: $' .. result.balance)
+
+-- Translate a string
+local msg = exports.helix_lib:locale_t('money_added', result.balance)
+exports.helix_lib:notify(msg, 'success')
+```
+
+## Export Architecture
+
+All exports use a **flat per-function** pattern. This is intentional — FiveM's export proxy strips methods from returned tables. Instead of `exports.helix_lib:bridge().GetPlayer(src)`, you call `exports.helix_lib:bridge_GetPlayer(src)` directly.
+
+See the [API Reference](/api/) for the complete export list.
 
 ---
 
@@ -10,118 +47,135 @@
 
 ### Framework Bridge
 
-Abstracts ESX, QBCore, and Qbox behind a single API so your code works everywhere without framework-specific branches.
+Automatically detects which framework is running and provides unified access to player data, money, jobs, inventory, and notifications.
+
+**Supported frameworks:**
+- **Qbox** (`qbx_core`)
+- **QBCore** (`qb-core`)
+- **ESX** (`es_extended`)
+- **Standalone** (fallback — all functions return nil/false/0)
+
+Detection order: Qbox → QBCore → ESX → Standalone. Override in `config.lua` if needed.
 
 ```lua
-local bridge = exports.helix_lib:bridge()
+-- Check which framework is active
+local fw = exports.helix_lib:bridge_framework()
+print(fw) -- 'qbox', 'qbcore', 'esx', or 'standalone'
 
--- Get the player's job (works on ESX, QBCore, and Qbox)
-local job = bridge.getPlayerJob(source)
-print(job.name, job.grade)
+-- Check for a specific framework
+if exports.helix_lib:bridge_is('qbox') then
+    -- Qbox-specific logic
+end
+
+-- Get player data (server-side)
+local player = exports.helix_lib:bridge_GetPlayer(source)
+local job = exports.helix_lib:bridge_GetPlayerJob(source)
+local money = exports.helix_lib:bridge_GetPlayerMoney(source, 'bank')
 ```
 
-**Key functions:**
-
-| Function | Side | Description |
-|----------|------|-------------|
-| `bridge.getPlayerJob(src)` | Server | Returns `{ name, label, grade, gradeLabel }` |
-| `bridge.getPlayerMoney(src, account?)` | Server | Returns balance for the given account |
-| `bridge.getPlayerName(src)` | Server | Returns the character's full name |
-| `bridge.getPlayers()` | Server | Returns an array of all connected player sources |
-| `bridge.notify(msg, type?, duration?)` | Client | Sends a notification to the player |
+See the [Framework Bridge Guide](/guides/framework-bridge) for detailed framework differences.
 
 ---
 
 ### Config System
 
-Load and hot-reload Lua config tables at runtime.
+Every Helix script ships with a `config.lua` at its root. The config system loads these as Lua tables, merges with defaults, and supports runtime hot-reload.
 
 ```lua
+-- Get the config table (returns HelixConfig module)
 local config = exports.helix_lib:config()
 
-local hud = config.get('helix_hud')
-print(hud.position) -- 'bottom-center'
+-- Load another resource's config with defaults
+local cfg = config.load('helix_hud', { position = 'bottom-center' })
 ```
 
-See the [Configuration guide](/getting-started/configuration) for details on writing config files.
+See the [Configuration Guide](/getting-started/configuration) for all options.
 
 ---
 
 ### Callback System
 
-Framework-agnostic server/client callbacks with automatic promise support.
+Framework-agnostic RPC between client and server. If `ox_lib` is present, wraps its callback system automatically — your code works identically either way.
 
 ```lua
--- Server: register a callback
-exports.helix_lib:callback('helix:getInventory', function(source)
-    local items = getPlayerItems(source)
-    return items
+-- Server: register
+exports.helix_lib:callback_register('shop:getItems', function(source, category)
+    return getShopItems(category)
 end)
 
--- Client: trigger the callback
-local items = exports.helix_lib:callback('helix:getInventory')
-for _, item in ipairs(items) do
-    print(item.name, item.count)
-end
-```
+-- Client: async with callback
+exports.helix_lib:callback_trigger('shop:getItems', function(items)
+    for _, item in ipairs(items) do
+        print(item.name)
+    end
+end, 'weapons')
 
----
-
-### NUI Design System
-
-A shared set of React components and CSS design tokens so every Helix NUI has a consistent look and feel.
-
-- Colour tokens follow the teal/cyan palette
-- Typography, spacing, and border-radius are standardised
-- Dark mode by default with optional light mode toggle
-
-```lua
--- Client: send data to the NUI
-exports.helix_lib:notify('Inventory updated', 'success')
+-- Client: blocking await
+local items = exports.helix_lib:callback_await('shop:getItems', 'weapons')
 ```
 
 ---
 
 ### Locale System
 
-Multi-language support with interpolation.
+Multi-language translations with `string.format` interpolation. Falls back to English when a key is missing in the active locale.
 
 ```lua
-local locale = exports.helix_lib:locale()
+-- Translate a key
+local msg = exports.helix_lib:locale_t('greeting', 'Alex')
+-- With en.lua: { greeting = 'Hello, %s!' } → "Hello, Alex!"
 
--- locale/en.lua: { greeting = 'Hello, %s!' }
-print(locale.t('greeting', 'Alex')) -- "Hello, Alex!"
+-- Check if a key exists
+local exists = exports.helix_lib:locale_has('greeting') -- true
+
+-- Get/set active locale
+local lang = exports.helix_lib:locale_current() -- 'en'
+exports.helix_lib:locale_set('nl')
+
+-- Load translations from file
+exports.helix_lib:locale_loadFile('nl')
+
+-- Load translations from another resource
+exports.helix_lib:locale_loadFile('en', 'helix_hud')
 ```
 
-Add translations by creating files in the `locale/` directory of any Helix resource (e.g. `locale/en.lua`, `locale/fr.lua`).
+Create locale files at `locales/<lang>.lua` in your resource:
+
+```lua
+-- locales/en.lua
+return {
+    greeting = 'Hello, %s!',
+    money_added = '$%s has been added to your account.',
+    error_no_permission = 'You do not have permission to do this.',
+}
+```
 
 ---
 
 ### Version Check
 
-Automatic update checking against GitHub releases. Prints a console warning on start-up if a newer version is available. No outbound telemetry — only a single GitHub API call per resource start.
+On resource start, checks the GitHub releases API for newer versions. Prints a console notice if an update is available. No telemetry — one GET request to `api.github.com`, that's it.
+
+Disable in `config.lua`:
+
+```lua
+return {
+    versionCheck = false,
+}
+```
 
 ---
 
-## Exports summary
+## Dependencies
 
-### Client
+`helix_lib` has **zero hard dependencies**. It works standalone out of the box.
 
-| Export | Description |
-|--------|-------------|
-| `bridge()` | Returns the framework bridge table |
-| `config()` | Returns the config manager |
-| `locale()` | Returns the locale manager |
-| `callback(name, ...)` | Triggers a server callback |
-| `notify(msg, type?, duration?)` | Shows a notification |
+**Optional integrations:**
+- `ox_lib` — If present, callbacks route through ox_lib's system for compatibility with other ox-based resources
+- `ox_inventory` — If present, `bridge_HasItem` uses ox_inventory's item checks
 
-### Server
+## Resource Weight
 
-| Export | Description |
-|--------|-------------|
-| `bridge()` | Returns the framework bridge table |
-| `config()` | Returns the config manager |
-| `locale()` | Returns the locale manager |
-| `callback(name, handler)` | Registers a callback |
-| `getPlayer(src)` | Returns a unified player object |
-| `getPlayers()` | Returns all connected player objects |
+- Idle resmon: < 0.01ms
+- NUI bundle: < 100KB gzipped
+- No persistent threads beyond the version check on startup
