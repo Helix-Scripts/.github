@@ -4,7 +4,7 @@ AI-powered development tooling for FiveM. MCP bridge that lets Claude Code, Curs
 
 ## Features
 
-- **MCP Bridge** — 32 tools across 8 categories, accessible via Streamable HTTP transport
+- **MCP Bridge** — 41 tools across 9 categories, accessible via Streamable HTTP transport
 - **Token Authentication** — Secure API tokens with per-tool ACE permissions
 - **Audit Logging** — Every tool call logged with caller, timestamp, and parameters
 - **Safety by Default** — Dangerous tools disabled unless explicitly opted in via config
@@ -43,7 +43,7 @@ helix_devtools/
 │   ├── statebags.lua       # State bag tracking
 │   └── mcp/
 │       ├── server.lua      # MCP protocol handler (Streamable HTTP)
-│       ├── tools.lua       # 32 tool definitions & handlers
+│       ├── tools.lua       # 41 tool definitions & handlers
 │       └── auth.lua        # Token validation & ACE checks
 ├── nui/                    # React + Vite NUI panels
 └── README.md
@@ -97,7 +97,7 @@ Add to your Claude Code MCP config (`.claude/mcp.json`):
 
 ## Tool Reference
 
-See the full [MCP Tool Reference](./helix-devtools-tools) for detailed documentation of all 32 tools.
+See the full [MCP Tool Reference](./helix-devtools-tools) for detailed documentation of all 41 tools.
 
 ## Security Model
 
@@ -114,6 +114,8 @@ Tools that modify server state are marked `dangerous` and disabled by default. E
 - `trigger_event` — Fire arbitrary server events
 - `restart_resource` / `start_resource` / `stop_resource` / `ensure_resource` — Resource lifecycle
 - `execute_command` — Run console commands
+- `write_resource_file` / `delete_resource_file` — Modify resource files on disk
+- `query_database` — Execute SQL queries via oxmysql
 - `inject_supply` — Modify economy supply levels
 
 ### Filesystem Sandboxing

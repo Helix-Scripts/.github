@@ -1,6 +1,6 @@
 # MCP Tool Reference
 
-Complete reference for all 32 MCP tools provided by helix_devtools. Tools marked with a shield icon require explicit opt-in in `config.lua`.
+Complete reference for all 41 MCP tools provided by helix_devtools. Tools marked as **Dangerous** require explicit opt-in in `config.lua`.
 
 [[toc]]
 
@@ -46,6 +46,80 @@ List all currently connected players with their server ID, name, ping, and coord
       "coords": { "x": 215.3, "y": -810.5, "z": 30.7 },
       "endpoint": "192.168.1.100:12345"
     }
+  ]
+}
+```
+
+---
+
+### get_convar
+
+Read a server convar value by name. Returns the current value and detected type.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Convar name (e.g. `"sv_hostname"`, `"sv_maxclients"`) |
+| `default` | string | No | Default value if convar is not set (default: `""`) |
+
+**Example Request:**
+```json
+{ "name": "sv_hostname" }
+```
+
+**Example Response:**
+```json
+{
+  "name": "sv_hostname",
+  "value": "My FiveM Server",
+  "type": "string"
+}
+```
+
+---
+
+### set_convar
+
+Set a server convar value. Blocks security-sensitive convars (`sv_licensekey`, `rcon_password`, etc.).
+
+**Dangerous** — Requires `enableSetConvar = true` in config.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Convar name to set |
+| `value` | string | Yes | Value to set (always passed as string) |
+
+**Example Request:**
+```json
+{ "name": "sv_projectDesc", "value": "Updated server description" }
+```
+
+**Example Response:**
+```json
+{ "success": true, "name": "sv_projectDesc", "previousValue": "Old description", "newValue": "Updated server description" }
+```
+
+---
+
+### list_convars
+
+List commonly-used FiveM server convars and their current values. FiveM has no "list all convars" API, so only well-known convars are returned.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `filter` | string | No | Optional Lua pattern to filter convar names |
+
+**Example Request:**
+```json
+{ "filter": "sv_" }
+```
+
+**Example Response:**
+```json
+{
+  "count": 5,
+  "convars": [
+    { "name": "sv_hostname", "value": "My FiveM Server", "type": "string" },
+    { "name": "sv_maxclients", "value": "64", "type": "int", "intValue": 64 }
   ]
 }
 ```
@@ -348,6 +422,30 @@ Trigger a server event with the given payload.
 
 ---
 
+### trigger_client_event
+
+Trigger a client event on a specific player, or all players with `serverId: -1`.
+
+**Dangerous** — Requires `enableTriggerEvent = true` in config.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Event name to trigger on the client |
+| `serverId` | number | Yes | Target player server ID, or `-1` for all players |
+| `payload` | any | No | Event payload (unpacked as arguments) |
+
+**Example Request:**
+```json
+{ "name": "helix_hud:forceRefresh", "serverId": 1 }
+```
+
+**Example Response:**
+```json
+{ "success": true, "event": "helix_hud:forceRefresh", "target": 1 }
+```
+
+---
+
 ### subscribe_events
 
 Subscribe to events matching a Lua pattern. Matching events appear in the SSE event stream.
@@ -558,7 +656,7 @@ Execute a server console command.
 
 ## Filesystem
 
-All filesystem tools are **read-only** and scoped to FiveM resource directories. Path traversal (`..`) is rejected. Binary files are detected and content is withheld.
+Filesystem tools are scoped to FiveM resource directories. Path traversal (`..`) is rejected. Binary files are detected and content is withheld. Write/delete tools require explicit opt-in.
 
 ### list_resource_files
 
@@ -612,6 +710,135 @@ Read the contents of a file within a resource directory. Max 64KB.
   "size": 2048,
   "truncated": false,
   "content": "Config = {\n    ..."
+}
+```
+
+---
+
+### search_resource_files
+
+Search for files across one or all resources by name pattern.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `pattern` | string | Yes | Lua pattern to match file names (e.g. `"%.lua$"`, `"config"`) |
+| `resourceName` | string | No | Limit search to a specific resource. Omit to search all started resources. |
+
+**Example Request:**
+```json
+{ "pattern": "config%.lua$", "resourceName": "helix_economy" }
+```
+
+**Example Response:**
+```json
+{
+  "count": 1,
+  "matches": [
+    { "resource": "helix_economy", "path": "config.lua", "size": 2048 }
+  ]
+}
+```
+
+---
+
+### write_resource_file
+
+Write or overwrite a file within a resource directory.
+
+**Dangerous** — Requires `enableWriteResourceFile = true` in config.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `resourceName` | string | Yes | Name of the resource |
+| `filePath` | string | Yes | Relative path within the resource |
+| `content` | string | Yes | File content to write |
+
+**Example Request:**
+```json
+{ "resourceName": "helix_economy", "filePath": "config.lua", "content": "Config = { ... }" }
+```
+
+**Example Response:**
+```json
+{ "success": true, "resource": "helix_economy", "filePath": "config.lua", "bytesWritten": 1024 }
+```
+
+---
+
+### delete_resource_file
+
+Delete a file within a resource directory.
+
+**Dangerous** — Requires `enableWriteResourceFile = true` in config.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `resourceName` | string | Yes | Name of the resource |
+| `filePath` | string | Yes | Relative path within the resource |
+
+**Example Request:**
+```json
+{ "resourceName": "helix_economy", "filePath": "temp/debug.log" }
+```
+
+**Example Response:**
+```json
+{ "success": true, "resource": "helix_economy", "filePath": "temp/debug.log" }
+```
+
+---
+
+## Performance
+
+### get_resource_performance
+
+Get resmon (resource monitor) performance data for one or all resources.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `resourceName` | string | No | Specific resource to check. Omit for all started resources. |
+
+**Example Request:**
+```json
+{ "resourceName": "helix_economy" }
+```
+
+**Example Response:**
+```json
+{
+  "resource": "helix_economy",
+  "cpuTime": 0.02,
+  "memoryUsage": 1024
+}
+```
+
+---
+
+## Database
+
+### query_database
+
+Execute a read-only SQL query via oxmysql. Only `SELECT` statements are allowed.
+
+**Dangerous** — Requires `enableQueryDatabase = true` in config.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | string | Yes | SQL SELECT query |
+| `params` | array | No | Query parameters for prepared statements |
+
+**Example Request:**
+```json
+{ "query": "SELECT * FROM helix_economy_items WHERE category = ? LIMIT 10", "params": ["consumables"] }
+```
+
+**Example Response:**
+```json
+{
+  "rowCount": 3,
+  "rows": [
+    { "id": "water", "name": "Water Bottle", "category": "consumables", "base_price": 10 }
+  ]
 }
 ```
 

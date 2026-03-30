@@ -2,9 +2,7 @@
 
 Visual mission and quest system for FiveM with a flow editor, branching objectives, rewards, and player progress tracking.
 
-::: info Coming Soon
-Full documentation will be available here once the script is released. Below is a feature overview.
-:::
+**Version:** 1.0.0 | **License:** Commercial | **Dependencies:** [helix_lib](./helix-lib), [oxmysql](https://github.com/overextended/oxmysql)
 
 ## Features
 

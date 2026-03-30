@@ -13,7 +13,7 @@ AI-Enhanced NPC Interaction System for FiveM. Create living, breathing NPCs with
 - **CostGuard** — Per-player and server-wide token budgets and rate limiting
 - **Content Filter** — Multi-layer output filtering for LLM responses
 - **Cinematic NUI** — Letterbox, identity strip, panel mode, quest cards
-- **11 Pre-built Templates** — Ready-to-use NPC archetypes for common server roles
+- **12 Pre-built Templates** — Ready-to-use NPC archetypes for common server roles
 
 ## Requirements
 
@@ -276,7 +276,7 @@ end
 
 ## Pre-built Templates
 
-helix_npc ships with 11 ready-to-use NPC templates in the `npcs/` directory:
+helix_npc ships with 12 ready-to-use NPC templates in the `npcs/` directory:
 
 | Template | Role | Features |
 |----------|------|----------|
@@ -355,6 +355,8 @@ llm = {
 
 ## Exports
 
+### Client Exports
+
 | Export | Description |
 |--------|-------------|
 | `registerNpc(definition)` | Register an NPC from external scripts |
@@ -362,3 +364,14 @@ llm = {
 | `getNpcState(npcId)` | Get current NPC state |
 | `startDialogue(npcId)` | Open dialogue with an NPC |
 | `endDialogue(npcId)` | Close active dialogue |
+
+### Server Exports
+
+| Export | Description |
+|--------|-------------|
+| `registerNpcServer(definition)` | Register an NPC definition server-side |
+| `getPlayerNpcMemory(source, npcId)` | Get a player's memory with a specific NPC |
+| `recordNpcEvent(source, npcId, eventType, eventData)` | Record a notable event in NPC memory |
+| `registerQuestTemplate(template)` | Register a quest template for the quest engine |
+| `startLlmConversation(source, npcId)` | Initiate an LLM-powered conversation |
+| `getLlmUsageStats(period)` | Get LLM token usage statistics |

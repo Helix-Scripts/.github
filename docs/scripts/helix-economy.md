@@ -2,9 +2,7 @@
 
 Dynamic, real-time economy system for FiveM. Supply-and-demand pricing, market dashboards, auction house, and full admin controls.
 
-::: info Coming Soon
-Full documentation will be available here once the script is released. Below is a feature overview.
-:::
+**Version:** 1.0.0 | **License:** Commercial | **Dependencies:** [helix_lib](./helix-lib), [oxmysql](https://github.com/overextended/oxmysql)
 
 ## Features
 
@@ -37,7 +35,58 @@ helix_economy/
 ├── config.lua
 ├── client/
 ├── server/
+│   ├── database.lua        # Database schema & queries
+│   ├── registry.lua        # Item registration & management
+│   ├── price_engine.lua    # Supply/demand price calculation
+│   ├── tracker.lua         # Transaction tracking
+│   ├── auction.lua         # Auction house logic
+│   ├── trading.lua         # Player-to-player trading
+│   ├── health.lua          # Economy health monitoring
+│   ├── security.lua        # Anti-exploit measures
+│   └── main.lua            # Server entry point & exports
 ├── shared/
 ├── nui/              (React + Vite dashboard)
 └── html/             (Built NUI output)
+```
+
+## Exports
+
+### Server Exports
+
+| Export | Returns | Description |
+|--------|---------|-------------|
+| `GetPrice(itemId)` | `number` | Get current price for an item |
+| `GetPriceState(itemId)` | `table` | Get full price state (price, supply, demand, trend) |
+| `GetAllPrices()` | `table` | Get prices for all registered items |
+| `RegisterItem(definition)` | `boolean` | Register a new item in the economy |
+| `ItemExists(itemId)` | `boolean` | Check if an item is registered |
+| `IsItemFrozen(itemId)` | `boolean` | Check if an item's price is frozen |
+| `RecordSupply(itemId, amount, sourceType, playerId)` | `void` | Record a supply event |
+| `RecordDemand(itemId, amount, sourceType, playerId)` | `void` | Record a demand event |
+| `GetMarketSummary()` | `table` | Get market overview (total items, volume, trends) |
+| `GetTrending(limit, direction)` | `table` | Get trending items by price movement |
+| `GetHealthReport()` | `table` | Get economy health metrics |
+
+### Client Exports
+
+| Export | Returns | Description |
+|--------|---------|-------------|
+| `OpenDashboard()` | `void` | Open the market dashboard NUI |
+| `CloseDashboard()` | `void` | Close the market dashboard NUI |
+| `ToggleDashboard()` | `void` | Toggle dashboard visibility |
+
+```lua
+-- Server: register an item and record transactions
+exports.helix_economy:RegisterItem({
+    id = 'water',
+    name = 'Water Bottle',
+    category = 'consumables',
+    basePrice = 10,
+})
+
+local price = exports.helix_economy:GetPrice('water')
+exports.helix_economy:RecordDemand('water', 1, 'shop', source)
+
+-- Client: open the dashboard
+exports.helix_economy:OpenDashboard()
 ```

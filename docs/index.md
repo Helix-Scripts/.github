@@ -37,8 +37,12 @@ features:
     title: helix_dispatch
     details: Full-featured MDT with dispatch management, unit tracking, and BOLO system.
     link: /scripts/helix-dispatch
+  - icon: "\U0001F3C1"
+    title: helix_missions
+    details: Visual mission editor with branching objectives, rewards, and player progress tracking.
+    link: /scripts/helix-missions
   - icon: "\U0001F6E0\uFE0F"
     title: helix_devtools
-    details: In-game developer overlay with entity inspection, event monitoring, and state debugging.
+    details: MCP bridge with 41 tools for real-time server inspection, debugging, and administration.
     link: /scripts/helix-devtools
 ---
