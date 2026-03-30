@@ -42,13 +42,23 @@ helix_dispatch/
 ├── fxmanifest.lua
 ├── config.lua
 ├── client/
-│   ├── cl_main.lua         # Client entry point, NUI bridge, exports
-│   └── cl_blips.lua        # Blip management (call blips, GPS routes, panic flash)
+│   ├── cl_main.lua           # Client entry point, NUI bridge, keybinds
+│   └── cl_blips.lua          # Blip management (call blips, GPS routes, panic flash)
 ├── server/
-│   └── sv_main.lua         # All server managers (calls, units, routing, warrants, BOLOs, reports)
+│   ├── sv_main.lua           # Server entry point and exports
+│   ├── sv_calls.lua          # Call management and lifecycle
+│   ├── sv_units.lua          # Unit tracking and status
+│   ├── sv_routing.lua        # Smart dispatch routing engine
+│   ├── sv_bolos.lua          # BOLO system
+│   ├── sv_warrants.lua       # Warrant management
+│   ├── sv_reports.lua        # Incident report system
+│   ├── sv_departments.lua    # Department configuration
+│   └── sv_database.lua       # Database schema and queries
 ├── shared/
-├── nui/                    (React + Vite MDT interface)
-└── html/                   (Built NUI output)
+│   ├── enums.lua             # Status codes, priority levels, call types
+│   └── utils.lua             # Shared utility functions
+├── nui/                      # React + Vite MDT interface
+└── nui/dist/                 # Built NUI output
 ```
 
 ## Configuration

@@ -34,6 +34,7 @@ helix_economy/
 ├── fxmanifest.lua
 ├── config.lua
 ├── client/
+│   └── main.lua            # Client entry point, NUI bridge
 ├── server/
 │   ├── database.lua        # Database schema & queries
 │   ├── registry.lua        # Item registration & management
@@ -45,8 +46,9 @@ helix_economy/
 │   ├── security.lua        # Anti-exploit measures
 │   └── main.lua            # Server entry point & exports
 ├── shared/
-├── nui/              (React + Vite dashboard)
-└── html/             (Built NUI output)
+│   └── types.lua             # EmmyLua type annotations
+├── nui/                      # React + Vite dashboard source
+└── html/                     # Built NUI output
 ```
 
 ## Exports
