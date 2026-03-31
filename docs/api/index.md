@@ -96,7 +96,7 @@ Get a player's money balance.
 ```lua
 ---@param source number      Player server ID
 ---@param moneyType? string  'cash' | 'bank' | 'crypto' (default: 'cash')
----@return number
+---@return number?
 local cash = exports.helix_lib:bridge_GetPlayerMoney(source, 'cash')
 ```
 
@@ -430,7 +430,7 @@ end
 | `bridge_framework()` | `string` | Detected framework name |
 | `bridge_getFramework()` | `string` | Detected framework (function form) |
 | `bridge_is(fw)` | `boolean` | Check if framework matches |
-| `bridge_GetPlayerMoney(src, type?)` | `number` | Player money balance |
+| `bridge_GetPlayerMoney(src, type?)` | `number?` | Player money balance (nil on invalid source) |
 | `bridge_GetPlayerJob(src)` | `HelixJob?` | Player job info |
 | `bridge_GetPlayerIdentifier(src)` | `string?` | Player identifier |
 | `bridge_AddMoney(src, amt, type?)` | `boolean` | Add money |
@@ -456,7 +456,7 @@ end
 | `bridge_getFramework()` | `string` | Detected framework (function form) |
 | `bridge_is(fw)` | `boolean` | Check if framework matches |
 | `bridge_GetPlayer(src)` | `HelixPlayer?` | Full player object |
-| `bridge_GetPlayerMoney(src, type?)` | `number` | Player money balance |
+| `bridge_GetPlayerMoney(src, type?)` | `number?` | Player money balance (nil on invalid source) |
 | `bridge_GetPlayerJob(src)` | `HelixJob?` | Player job info |
 | `bridge_GetPlayerIdentifier(src)` | `string?` | Player identifier |
 | `bridge_AddMoney(src, amt, type?)` | `boolean` | Add money |
