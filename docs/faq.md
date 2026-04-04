@@ -28,4 +28,4 @@ Open an issue on the relevant GitHub repository under the [Helix-Scripts organis
 
 ## Is there a Discord?
 
-Not yet — check back soon for community links.
+Yes! Join us at [discord.gg/QcAkQ6ZAE6](https://discord.gg/QcAkQ6ZAE6) for support, development updates, and community discussion.

@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://helix-scripts.tebex.io">Store</a> •
-  <a href="https://discord.gg/helix-scripts">Discord</a> •
+  <a href="https://discord.gg/QcAkQ6ZAE6">Discord</a> •
   <a href="https://docs.helix-scripts.com">Documentation</a>
 </p>
 
@@ -56,7 +56,7 @@ Every Helix script ships with published `resmon` benchmarks. Our target: **sub-0
 ## Links
 
 - **Store**: [helix-scripts.tebex.io](https://helix-scripts.tebex.io)
-- **Discord**: [discord.gg/helix-scripts](https://discord.gg/helix-scripts)
+- **Discord**: [discord.gg/QcAkQ6ZAE6](https://discord.gg/QcAkQ6ZAE6)
 - **Documentation**: [docs.helix-scripts.com](https://docs.helix-scripts.com)
 
 ---

@@ -64,7 +64,7 @@ export default defineConfig({
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Helix-Scripts' },
-      { icon: 'discord', link: 'https://discord.gg/helix' },
+      { icon: 'discord', link: 'https://discord.gg/QcAkQ6ZAE6' },
     ],
     footer: {
       message: 'Premium FiveM resources.',
