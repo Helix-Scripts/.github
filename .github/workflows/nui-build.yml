@@ -24,7 +24,7 @@ jobs:
 
       - name: Lint
         continue-on-error: false
-        run: npx eslint .
+        run: npm run lint
 
       - name: Build
         continue-on-error: false
