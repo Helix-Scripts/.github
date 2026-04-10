@@ -2,7 +2,7 @@
 
 `helix_hud` is a high-performance FiveM HUD that leverages the [helix_lib](/scripts/helix-lib) framework bridge and NUI design system for a seamless experience across ESX, QBCore, and Qbox.
 
-**Version:** 0.1.0 | **License:** Commercial | **Dependency:** [helix_lib](./helix-lib)
+**Version:** 1.0.0 | **License:** MIT | **Dependency:** [helix_lib](./helix-lib)
 
 ---
 

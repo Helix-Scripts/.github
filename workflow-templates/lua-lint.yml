@@ -23,13 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install selene
-        run: |
-          curl -L -o selene.zip https://github.com/Kampfkarren/selene/releases/latest/download/selene-linux.zip
-          unzip selene.zip
-          chmod +x selene
-          sudo mv selene /usr/local/bin/
-
       - name: Run selene
-        continue-on-error: false
-        run: selene .
+        uses: NTBBloodbath/selene-action@v1.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --display-style=quiet .

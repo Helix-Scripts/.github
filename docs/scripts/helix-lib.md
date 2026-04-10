@@ -2,7 +2,7 @@
 
 `helix_lib` is the shared foundation for every Helix script. It provides a unified API layer across frameworks, a config system, localisation, NUI design components, and callback RPC — all through flat per-function exports that survive FiveM's export proxy.
 
-**Version:** 0.1.0 | **License:** MIT | **Price:** Free
+**Version:** 1.0.0 | **License:** MIT | **Price:** Free
 
 ---
 
@@ -128,9 +128,11 @@ local msg = exports.helix_lib:locale_t('greeting', 'Alex')
 -- Check if a key exists
 local exists = exports.helix_lib:locale_has('greeting') -- true
 
--- Get/set active locale
+-- Get active locale
 local lang = exports.helix_lib:locale_current() -- 'en'
-exports.helix_lib:locale_set('nl')
+
+-- Load translations from table
+exports.helix_lib:locale_load({ greeting = 'Hallo, %s!' })
 
 -- Load translations from file
 exports.helix_lib:locale_loadFile('nl')
