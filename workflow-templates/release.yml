@@ -1,74 +1,12 @@
 name: Release
 
 on:
-  workflow_call:
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
   release:
-    name: Package & Release
-    runs-on: ubuntu-latest
+    uses: Helix-Scripts/.github/.github/workflows/release.yml@main
     permissions:
       contents: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Get resource name
-        id: meta
-        run: |
-          echo "name=$(basename ${{ github.repository }})" >> "$GITHUB_OUTPUT"
-          echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-
-      - name: Check for NUI directory
-        id: nui-check
-        run: |
-          if [ -d "nui" ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - uses: actions/setup-node@v4
-        if: steps.nui-check.outputs.exists == 'true'
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: nui/package-lock.json
-
-      - name: Build NUI
-        if: steps.nui-check.outputs.exists == 'true'
-        continue-on-error: false
-        run: |
-          cd nui
-          npm ci
-          npm run build
-
-      - name: Package resource
-        continue-on-error: false
-        run: |
-          mkdir -p /tmp/release
-          rsync -a \
-            --exclude='nui/src' \
-            --exclude='nui/node_modules' \
-            --exclude='.github' \
-            --exclude='.git' \
-            --exclude='.gitignore' \
-            --exclude='.editorconfig' \
-            --exclude='*.md' \
-            --exclude='.stylua.toml' \
-            --exclude='selene.toml' \
-            --exclude='.luarc.json' \
-            --exclude='package*.json' \
-            --exclude='tsconfig*.json' \
-            --exclude='vite.config.ts' \
-            --exclude='.eslintrc*' \
-            --exclude='.prettierrc*' \
-            ./ /tmp/release/${{ steps.meta.outputs.name }}/
-          cd /tmp/release
-          zip -r /tmp/${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.tag }}.zip ${{ steps.meta.outputs.name }}/
-
-      - name: Create GitHub Release
-        continue-on-error: false
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.meta.outputs.tag }}
-          name: ${{ steps.meta.outputs.name }} ${{ steps.meta.outputs.tag }}
-          generate_release_notes: true
-          files: /tmp/${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.tag }}.zip

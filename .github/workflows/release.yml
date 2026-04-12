@@ -1,11 +1,11 @@
-name: Release
+name: Release Package
 
 on:
   workflow_call:
 
 jobs:
-  release:
-    name: Package & Release
+  package:
+    name: Package & Upload
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -14,61 +14,55 @@ jobs:
 
       - name: Get resource name
         id: meta
-        run: |
-          echo "name=$(basename ${{ github.repository }})" >> "$GITHUB_OUTPUT"
-          echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-
-      - name: Check for NUI directory
-        id: nui-check
-        run: |
-          if [ -d "nui" ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - uses: actions/setup-node@v4
-        if: steps.nui-check.outputs.exists == 'true'
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: nui/package-lock.json
-
-      - name: Build NUI
-        if: steps.nui-check.outputs.exists == 'true'
-        continue-on-error: false
-        run: |
-          cd nui
-          npm ci
-          npm run build
+        run: echo "name=$(basename ${{ github.repository }})" >> "$GITHUB_OUTPUT"
 
       - name: Package resource
-        continue-on-error: false
         run: |
-          mkdir -p /tmp/release
+          mkdir -p /tmp/release/${{ steps.meta.outputs.name }}
           rsync -a \
-            --exclude='nui/src' \
-            --exclude='nui/node_modules' \
-            --exclude='.github' \
+            --include='README.md' \
             --exclude='.git' \
-            --exclude='.gitignore' \
-            --exclude='.editorconfig' \
+            --exclude='.github' \
+            --exclude='nui' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='selene' \
+            --exclude='docs' \
+            --exclude='*.test.lua' \
+            --exclude='*.spec.lua' \
             --exclude='*.md' \
+            --exclude='.luacheckrc' \
+            --exclude='.luarc.json' \
             --exclude='.stylua.toml' \
             --exclude='selene.toml' \
-            --exclude='.luarc.json' \
-            --exclude='package*.json' \
-            --exclude='tsconfig*.json' \
-            --exclude='vite.config.ts' \
+            --exclude='fivem.yml' \
+            --exclude='.editorconfig' \
+            --exclude='.gitignore' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='tsconfig.json' \
+            --exclude='tsconfig.*.json' \
+            --exclude='vite.config.*' \
+            --exclude='postcss.config.*' \
+            --exclude='tailwind.config.*' \
             --exclude='.eslintrc*' \
+            --exclude='eslint.config.*' \
             --exclude='.prettierrc*' \
+            --exclude='test.sh' \
+            --exclude='preview.png' \
             ./ /tmp/release/${{ steps.meta.outputs.name }}/
           cd /tmp/release
-          zip -r /tmp/${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.tag }}.zip ${{ steps.meta.outputs.name }}/
+          zip -r /tmp/${{ steps.meta.outputs.name }}.zip ${{ steps.meta.outputs.name }}/
 
-      - name: Create GitHub Release
-        continue-on-error: false
-        uses: softprops/action-gh-release@v2
+      - name: Upload release asset
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" "/tmp/${{ steps.meta.outputs.name }}.zip" --clobber
+
+      - name: Upload artifact (manual run)
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ steps.meta.outputs.tag }}
-          name: ${{ steps.meta.outputs.name }} ${{ steps.meta.outputs.tag }}
-          generate_release_notes: true
-          files: /tmp/${{ steps.meta.outputs.name }}-${{ steps.meta.outputs.tag }}.zip
+          name: ${{ steps.meta.outputs.name }}
+          path: /tmp/${{ steps.meta.outputs.name }}.zip
